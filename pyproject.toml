@@ -1,0 +1,35 @@
+[project]
+name = "ai-employee"
+version = "0.1.0"
+description = "Python greeting CLI created by the AI employee developer workflow."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Rana Masud" }]
+
+[project.scripts]
+hello = "hello:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["hello"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.12"
+files = ["hello.py", "tests"]
+warn_return_any = true
+warn_unused_configs = true
+no_implicit_optional = true
