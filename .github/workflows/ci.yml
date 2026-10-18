@@ -26,3 +26,43 @@ jobs:
         run: mypy
       - name: Test
         run: python -m unittest discover -s tests -v
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy the revision to the VM and restart the API
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          VM_HOST: 34.44.253.122
+          VM_USER: khand
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$VM_HOST" >> ~/.ssh/known_hosts
+          SSH=(ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes)
+          tar -czf - --exclude .git --exclude .venv . | "${SSH[@]}" "$VM_USER@$VM_HOST" "mkdir -p /home/khand/ai-employee && tar -xzf - -C /home/khand/ai-employee"
+          "${SSH[@]}" "$VM_USER@$VM_HOST" "bash -s" << 'EOF'
+          set -euo pipefail
+          cd /home/khand/ai-employee
+          python3 -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -e .
+          sed -i 's/\r$//' deploy/ai-employee-api.service
+          sudo -n cp deploy/ai-employee-api.service /etc/systemd/system/ai-employee-api.service
+          sudo -n systemctl daemon-reload
+          sudo -n systemctl enable ai-employee-api.service
+          sudo -n systemctl restart ai-employee-api.service
+          sleep 2
+          curl -fsS http://127.0.0.1:8000/health
+          echo
+          curl -fsS http://127.0.0.1:8000/
+          echo
+          curl -fsS -X POST http://127.0.0.1:8000/task -H "Content-Type: application/json" -d '{"task":"div","parm1":5,"parm2":4}'
+          echo
+          systemctl is-active ai-employee-api.service
+          EOF
