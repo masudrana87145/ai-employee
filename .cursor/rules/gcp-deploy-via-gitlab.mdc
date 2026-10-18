@@ -29,5 +29,5 @@ deploy_vm:
 
 ```powershell
 # Bad: uploading the working tree from this PC
-gcloud compute scp api.py rana-python-app-server:/home/khand/ai-employee/
+gcloud compute scp api.py rana-python-app-server:/home/masudrana87145/ai-employee/
 ```

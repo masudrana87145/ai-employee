@@ -37,7 +37,7 @@ jobs:
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           VM_HOST: 34.44.253.122
-          VM_USER: khand
+          VM_USER: masudrana87145
         run: |
           set -euo pipefail
           if [ -z "${DEPLOY_SSH_KEY}" ] || ! printf '%s' "$DEPLOY_SSH_KEY" | grep -q "OPENSSH PRIVATE KEY"; then
@@ -50,10 +50,10 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keygen -lf ~/.ssh/deploy_key
           SSH=(ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20)
-          tar -czf - --exclude .git --exclude .venv . | "${SSH[@]}" "$VM_USER@$VM_HOST" "mkdir -p /home/khand/ai-employee && tar -xzf - -C /home/khand/ai-employee"
+          tar -czf - --exclude .git --exclude .venv . | "${SSH[@]}" "$VM_USER@$VM_HOST" "mkdir -p /home/masudrana87145/ai-employee && tar -xzf - -C /home/masudrana87145/ai-employee"
           "${SSH[@]}" "$VM_USER@$VM_HOST" "bash -s" << 'EOF'
           set -euo pipefail
-          cd /home/khand/ai-employee
+          cd /home/masudrana87145/ai-employee
           python3 -m venv .venv
           .venv/bin/pip install --upgrade pip
           .venv/bin/pip install -e .
