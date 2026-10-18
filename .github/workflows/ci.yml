@@ -40,11 +40,16 @@ jobs:
           VM_USER: khand
         run: |
           set -euo pipefail
+          if [ -z "${DEPLOY_SSH_KEY}" ] || ! printf '%s' "$DEPLOY_SSH_KEY" | grep -q "OPENSSH PRIVATE KEY"; then
+            echo "DEPLOY_SSH_KEY is missing or is not an OpenSSH private key."
+            exit 1
+          fi
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          sed -i '1s/^\xEF\xBB\xBF//' ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$VM_HOST" >> ~/.ssh/known_hosts
-          SSH=(ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes)
+          ssh-keygen -lf ~/.ssh/deploy_key
+          SSH=(ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20)
           tar -czf - --exclude .git --exclude .venv . | "${SSH[@]}" "$VM_USER@$VM_HOST" "mkdir -p /home/khand/ai-employee && tar -xzf - -C /home/khand/ai-employee"
           "${SSH[@]}" "$VM_USER@$VM_HOST" "bash -s" << 'EOF'
           set -euo pipefail
