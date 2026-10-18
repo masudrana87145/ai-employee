@@ -6,7 +6,7 @@ import io
 import unittest
 from unittest.mock import patch
 
-from arith import add, calculate, main, mult, sub
+from arith import add, calculate, div, main, mult, sub
 
 
 class TestFunctions(unittest.TestCase):
@@ -25,12 +25,23 @@ class TestFunctions(unittest.TestCase):
     def test_zero_and_negative_operands(self) -> None:
         self.assertEqual(add(-2, 0), -2)
 
+    def test_div(self) -> None:
+        self.assertEqual(div(5, 4), 1.25)
+
+    def test_div_whole_number(self) -> None:
+        self.assertEqual(div(8, 2), 4.0)
+
+    def test_div_by_zero(self) -> None:
+        with self.assertRaises(ValueError):
+            div(5, 0)
+
 
 class TestCalculate(unittest.TestCase):
     def test_function_name_is_case_insensitive(self) -> None:
         self.assertEqual(calculate("ADD", 2, 3), 5)
         self.assertEqual(calculate("Mult", 2, 3), 6)
         self.assertEqual(calculate("sUb", 2, 3), -1)
+        self.assertEqual(calculate("DIV", 8, 2), 4.0)
 
     def test_function_name_whitespace_is_ignored(self) -> None:
         self.assertEqual(calculate("  add  ", 1, 1), 2)
@@ -43,6 +54,7 @@ class TestCalculate(unittest.TestCase):
         self.assertIn("add (Add two numbers)", message)
         self.assertIn("mult (Multiply two numbers)", message)
         self.assertIn("sub (Subtract the second number from the first)", message)
+        self.assertIn("div (Divide the first number by the second)", message)
 
     def test_blank_function_name(self) -> None:
         with self.assertRaises(ValueError) as caught:
@@ -62,6 +74,18 @@ class TestMain(unittest.TestCase):
             exit_code = main(["mult", "5", "4"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(stdout.getvalue(), "20\n")
+
+    def test_main_div(self) -> None:
+        with patch("sys.stdout", new_callable=io.StringIO) as stdout:
+            exit_code = main(["div", "5", "4"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stdout.getvalue(), "1.25\n")
+
+    def test_main_div_by_zero(self) -> None:
+        with patch("sys.stderr", new_callable=io.StringIO) as stderr:
+            exit_code = main(["div", "5", "0"])
+        self.assertEqual(exit_code, 2)
+        self.assertIn("Cannot divide by zero", stderr.getvalue())
 
     def test_main_sub(self) -> None:
         with patch("sys.stdout", new_callable=io.StringIO) as stdout:

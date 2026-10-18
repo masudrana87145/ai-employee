@@ -58,6 +58,16 @@ class TestApplyTask(unittest.TestCase):
     def test_sub(self) -> None:
         self.assertEqual(apply_task("sub", 5, 4), "Difference of 5 and 4 is 1")
 
+    def test_div(self) -> None:
+        self.assertEqual(apply_task("div", 5, 4), "Quotient of 5 and 4 is 1.25")
+
+    def test_div_whole_number(self) -> None:
+        self.assertEqual(apply_task("div", 8, 2), "Quotient of 8 and 2 is 4")
+
+    def test_div_by_zero(self) -> None:
+        with self.assertRaises(ValueError):
+            apply_task("div", 5, 0)
+
     def test_sub_negative_result(self) -> None:
         self.assertEqual(apply_task("sub", 4, 5), "Difference of 4 and 5 is -1")
 
@@ -85,17 +95,34 @@ class TestTaskEndpoint(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["message"], "Difference of 5 and 4 is 1")
 
+    def test_div(self) -> None:
+        response = client.post("/task", json={"task": "div", "parm1": 5, "parm2": 4})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["message"], "Quotient of 5 and 4 is 1.25")
+
+    def test_div_by_zero(self) -> None:
+        response = client.post("/task", json={"task": "div", "parm1": 5, "parm2": 0})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "Cannot divide by zero")
+
     def test_task_name_is_case_insensitive(self) -> None:
         cases = {
             "ADD": "Sum of 2 and 3 is 5",
             "Mult": "Product of 2 and 3 is 6",
             "sUb": "Difference of 2 and 3 is -1",
+            "DiV": "Quotient of 8 and 2 is 4",
         }
         for task, expected in cases.items():
             with self.subTest(task=task):
                 response = client.post(
                     "/task",
-                    json={"task": task, "parm1": 2, "parm2": 3},
+                    json={
+                    "task": task,
+                    "parm1": 8 if task == "DiV" else 2,
+                    "parm2": 2 if task == "DiV" else 3,
+                },
                 )
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json()["message"], expected)
@@ -134,13 +161,14 @@ class TestTaskEndpoint(unittest.TestCase):
         self.assertEqual(purposes["add"], "Add two numbers")
         self.assertEqual(purposes["mult"], "Multiply two numbers")
         self.assertEqual(purposes["sub"], "Subtract the second number from the first")
+        self.assertEqual(purposes["div"], "Divide the first number by the second")
 
     def test_blank_task_lists_valid_tasks(self) -> None:
         response = client.post("/task", json={"task": "   ", "parm1": 1, "parm2": 2})
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("Unsupported task", response.json()["error"])
-        self.assertEqual(len(response.json()["valid_tasks"]), 3)
+        self.assertEqual(len(response.json()["valid_tasks"]), 4)
 
     def test_rejects_non_integer(self) -> None:
         response = client.post("/task", json={"task": "add", "parm1": 5.5, "parm2": 4})

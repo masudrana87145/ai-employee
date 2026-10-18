@@ -37,6 +37,7 @@ Call `add`, `mult`, or `sub`, then two integers (`arg1` and `arg2`):
 python arith.py add 5 4
 python arith.py mult 5 4
 python arith.py sub 5 4
+python arith.py div 5 4
 ```
 
 Expected output:
@@ -45,9 +46,10 @@ Expected output:
 9
 20
 1
+1.25
 ```
 
-`sub` subtracts `arg2` from `arg1`. The function name may be any letter case. Any other name prints an error that lists `add`, `mult`, and `sub` with their purposes, and exits with code 2.
+`sub` subtracts `arg2` from `arg1`. `div` divides `arg1` by `arg2`. Division by zero prints an error and exits with code 2. The function name may be any letter case. Any other name prints an error that lists `add`, `mult`, `sub`, and `div` with their purposes, and exits with code 2.
 
 The same operations are available in Python:
 
@@ -82,7 +84,8 @@ The server listens on `http://127.0.0.1:8000`. Interactive docs are at `/docs`.
   "operations": [
     {"task": "add", "purpose": "Add two numbers"},
     {"task": "mult", "purpose": "Multiply two numbers"},
-    {"task": "sub", "purpose": "Subtract the second number from the first"}
+    {"task": "sub", "purpose": "Subtract the second number from the first"},
+    {"task": "div", "purpose": "Divide the first number by the second"}
   ],
   "sample_payload": {"task": "add", "parm1": 5, "parm2": 4}
 }
@@ -117,6 +120,7 @@ A blank name returns HTTP 422.
 | `add` | Add two numbers | `Sum of 5 and 4 is 9` |
 | `mult` | Multiply two numbers | `Product of 5 and 4 is 20` |
 | `sub` | Subtract the second number from the first | `Difference of 5 and 4 is 1` |
+| `div` | Divide the first number by the second | `Quotient of 5 and 4 is 1.25` |
 
 Any other task returns HTTP 400 with the valid tasks and their purposes:
 
@@ -126,7 +130,8 @@ Any other task returns HTTP 400 with the valid tasks and their purposes:
   "valid_tasks": [
     {"task": "add", "purpose": "Add two numbers"},
     {"task": "mult", "purpose": "Multiply two numbers"},
-    {"task": "sub", "purpose": "Subtract the second number from the first"}
+    {"task": "sub", "purpose": "Subtract the second number from the first"},
+    {"task": "div", "purpose": "Divide the first number by the second"}
   ]
 }
 ```

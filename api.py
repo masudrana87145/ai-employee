@@ -12,6 +12,7 @@ SUPPORTED_TASKS: dict[str, str] = {
     "add": "Add two numbers",
     "mult": "Multiply two numbers",
     "sub": "Subtract the second number from the first",
+    "div": "Divide the first number by the second",
 }
 
 
@@ -35,7 +36,7 @@ class TaskRequest(BaseModel):
     task: str = Field(
         min_length=1,
         max_length=50,
-        description="Task name: add, mult, or sub. Any letter case is accepted.",
+        description="Task name: add, mult, sub, or div. Any letter case is accepted.",
         examples=["add"],
     )
     parm1: int = Field(strict=True, description="First integer.", examples=[5])
@@ -69,7 +70,7 @@ SAMPLE_PAYLOAD = TaskRequest(task="add", parm1=5, parm2=4)
 app = FastAPI(
     title="ai-employee API",
     version="0.1.0",
-    description="Greeting query and add, multiply, or subtract tasks.",
+    description="Greeting query and add, multiply, subtract, or divide tasks.",
 )
 
 
@@ -104,6 +105,12 @@ def apply_task(task: str, parm1: int, parm2: int) -> str:
         return f"Product of {parm1} and {parm2} is {parm1 * parm2}"
     if task == "sub":
         return f"Difference of {parm1} and {parm2} is {parm1 - parm2}"
+    if task == "div":
+        if parm2 == 0:
+            raise ValueError("Cannot divide by zero")
+        quotient = parm1 / parm2
+        shown = int(quotient) if quotient.is_integer() else quotient
+        return f"Quotient of {parm1} and {parm2} is {shown}"
     raise ValueError(task)
 
 
@@ -161,11 +168,15 @@ def say_hi(
     tags=["tasks"],
 )
 def run_task(body: TaskRequest) -> MessageResponse | JSONResponse:
-    """Add, multiply, or subtract parm1 and parm2."""
+    """Add, multiply, subtract, or divide parm1 and parm2."""
     normalized = body.task.strip().lower()
     if normalized not in SUPPORTED_TASKS:
         return task_error(body.task)
-    return MessageResponse(message=apply_task(normalized, body.parm1, body.parm2))
+    try:
+        message = apply_task(normalized, body.parm1, body.parm2)
+    except ValueError as exc:
+        return JSONResponse(status_code=400, content={"error": str(exc)})
+    return MessageResponse(message=message)
 
 
 def main() -> None:

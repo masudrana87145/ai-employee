@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Completion report — ai-employee</title>
+  <style>
+    body { font-family: Georgia, serif; line-height: 1.5; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+    h1, h2 { font-family: "Segoe UI", sans-serif; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #f4f4f4; }
+    code { font-family: Consolas, monospace; font-size: 0.92em; }
+    .pass { color: #0b6b2a; font-weight: 700; }
+    .fail { color: #9b1c1c; font-weight: 700; }
+    .notrun { color: #6b4f00; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Completion report</h1>
+  <p>Project: <code>ai-employee</code>. Updated after the root path was added, the local API was started, and commit <code>ef9563d</code> was pushed to GitHub <code>main</code>. Fresh checks below were run on 17 October 2026.</p>
+
+  <h2>What changed and why</h2>
+  <p><code>GET /</code> now lists the valid arithmetic operations and a sample JSON body for <code>POST /task</code>. The API and arithmetic CLI were published to GitHub so the test workflow can run them.</p>
+  <ul>
+    <li><code>GET /</code> returns <code>add</code>, <code>mult</code>, and <code>sub</code> with their purposes, and <code>sample_payload</code> <code>{"task":"add","parm1":5,"parm2":4}</code>.</li>
+    <li><code>GET /hi?name=Masud</code> returns <code>{"message":"Hi, Masud"}</code>.</li>
+    <li><code>POST /task</code> with that sample returns <code>{"message":"Sum of 5 and 4 is 9"}</code>.</li>
+  </ul>
+
+  <h2>Files added or modified</h2>
+  <table>
+    <thead>
+      <tr><th>File</th><th>Change</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>api.py</code></td><td>Added the API, then added <code>GET /</code>.</td></tr>
+      <tr><td><code>arith.py</code></td><td>Added. CLI for add, mult, and sub.</td></tr>
+      <tr><td><code>tests/test_api.py</code></td><td>Added API tests, including the root path.</td></tr>
+      <tr><td><code>tests/test_arith.py</code></td><td>Added arithmetic CLI tests.</td></tr>
+      <tr><td><code>pyproject.toml</code></td><td>Dependencies and modules for the API and arithmetic CLI.</td></tr>
+      <tr><td><code>README.md</code></td><td>Documents the CLI, API, and <code>GET /</code>.</td></tr>
+      <tr><td><code>.github/workflows/ci.yml</code></td><td>Install, lint, type-check, and test. No deploy job.</td></tr>
+      <tr><td><code>.cursor/rules/gcp-deploy-via-gitlab.mdc</code></td><td>Deploy rule: GitLab CI, not a local file copy.</td></tr>
+      <tr><td><code>completion-report.html</code></td><td>This report. It was not part of commit <code>ef9563d</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Validation</h2>
+  <table>
+    <thead>
+      <tr><th>Command</th><th>Result</th><th>Evidence</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>.\.venv\Scripts\python -m compileall -q hello.py arith.py api.py tests</code></td>
+        <td class="pass">pass</td>
+        <td>Exit code 0.</td>
+      </tr>
+      <tr>
+        <td><code>.\.venv\Scripts\ruff check hello.py arith.py api.py tests</code></td>
+        <td class="pass">pass</td>
+        <td>Exit code 0. Output: “All checks passed!”</td>
+      </tr>
+      <tr>
+        <td><code>.\.venv\Scripts\mypy</code></td>
+        <td class="pass">pass</td>
+        <td>Exit code 0. Output: “Success: no issues found in 7 source files”.</td>
+      </tr>
+      <tr>
+        <td><code>.\.venv\Scripts\python -m unittest discover -s tests -v</code></td>
+        <td class="pass">pass</td>
+        <td>48 tests, OK, exit code 0, about 0.140 seconds. Includes <code>test_root_lists_operations_and_sample_payload</code>.</td>
+      </tr>
+      <tr>
+        <td><code>curl.exe -fsS http://127.0.0.1:8000/</code></td>
+        <td class="pass">pass</td>
+        <td>Local server returned the three operations and the sample payload.</td>
+      </tr>
+      <tr>
+        <td><code>curl.exe -fsS http://127.0.0.1:8000/hi?name=Masud</code></td>
+        <td class="pass">pass</td>
+        <td>Earlier local check returned <code>{"message":"Hi, Masud"}</code>.</td>
+      </tr>
+      <tr>
+        <td><code>curl.exe -fsS -X POST http://127.0.0.1:8000/task</code> with the sample payload</td>
+        <td class="pass">pass</td>
+        <td>Earlier local check returned <code>{"message":"Sum of 5 and 4 is 9"}</code>.</td>
+      </tr>
+      <tr>
+        <td><code>pip-audit</code></td>
+        <td class="notrun">not run</td>
+        <td>Not configured in the project.</td>
+      </tr>
+      <tr>
+        <td><code>bandit</code></td>
+        <td class="notrun">not run</td>
+        <td>Not configured in the project.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Limitations and user action</h2>
+  <ul>
+    <li>GitHub branch for this repository is <code>main</code>. There is no <code>master</code> branch.</li>
+    <li>Pushing to <code>main</code> starts tests only. <code>.github/workflows/ci.yml</code> has no deploy job.</li>
+    <li><code>.gitlab-ci.yml</code> is not in the repository, so GitLab did not deploy this change.</li>
+    <li>The Google Cloud VM still has the earlier copy. <code>GET /</code> on that VM does not include this root response until a GitLab deploy runs.</li>
+    <li>The local API is <code>http://127.0.0.1:8000/</code>. In PowerShell, call it with <code>curl.exe</code>, because <code>curl</code> is an alias for <code>Invoke-WebRequest</code>.</li>
+  </ul>
+
+  <h2>Deployment status</h2>
+  <p>Code was pushed to GitHub: <code>ef9563d</code> on <code>main</code> at <code>https://github.com/masudrana87145/ai-employee</code>. That push was authorized. It does not update the VM.</p>
+  <p>An earlier local deploy copied the API to VM <code>rana-python-app-server</code> (<code>34.44.253.122</code>) and started systemd service <code>ai-employee-api</code> on port 8000. That copy predates <code>GET /</code>. No new VM deploy was performed for the root-path change.</p>
+
+  <h2>Division operation</h2>
+  <p><code>div</code> divides the first number by the second. <code>GET /</code> includes it with the other operations. Division by zero returns HTTP 400, <code>{"error":"Cannot divide by zero"}</code>.</p>
+  <table>
+    <thead>
+      <tr><th>Command</th><th>Result</th><th>Evidence</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>.\.venv\Scripts\python -m compileall -q hello.py arith.py api.py tests</code></td>
+        <td class="pass">pass</td>
+        <td>Exit code 0.</td>
+      </tr>
+      <tr>
+        <td><code>.\.venv\Scripts\ruff check hello.py arith.py api.py tests</code></td>
+        <td class="pass">pass</td>
+        <td>Exit code 0. Output: “All checks passed!”</td>
+      </tr>
+      <tr>
+        <td><code>.\.venv\Scripts\mypy</code></td>
+        <td class="pass">pass</td>
+        <td>Exit code 0. Output: “Success: no issues found in 7 source files”.</td>
+      </tr>
+      <tr>
+        <td><code>.\.venv\Scripts\python -m unittest discover -s tests -v</code></td>
+        <td class="pass">pass</td>
+        <td>58 tests, OK, exit code 0, about 0.141 seconds.</td>
+      </tr>
+      <tr>
+        <td><code>curl.exe -fsS http://127.0.0.1:8000/</code></td>
+        <td class="pass">pass</td>
+        <td>Operations include <code>div</code>: “Divide the first number by the second”.</td>
+      </tr>
+      <tr>
+        <td><code>POST /task</code> with <code>{"task":"div","parm1":5,"parm2":4}</code></td>
+        <td class="pass">pass</td>
+        <td>HTTP 200. <code>{"message":"Quotient of 5 and 4 is 1.25"}</code>.</td>
+      </tr>
+      <tr>
+        <td><code>POST /task</code> with <code>{"task":"div","parm1":5,"parm2":0}</code></td>
+        <td class="pass">pass</td>
+        <td>HTTP 400. <code>{"error":"Cannot divide by zero"}</code>.</td>
+      </tr>
+      <tr>
+        <td>Deploy to the Google Cloud VM</td>
+        <td class="notrun">not run</td>
+        <td>The repository remote is GitHub <code>main</code> only. <code>.gitlab-ci.yml</code> is not present, and <code>.github/workflows/ci.yml</code> has no deploy job. The local copy was not uploaded with <code>gcloud compute scp</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
