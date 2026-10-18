@@ -1,0 +1,16 @@
+[Unit]
+Description=Country time API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=masudrana87145
+Group=masudrana87145
+WorkingDirectory=/home/masudrana87145/ai-employee
+ExecStart=/home/masudrana87145/ai-employee/.venv/bin/uvicorn country_time_api:app --host 0.0.0.0 --port 8001
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

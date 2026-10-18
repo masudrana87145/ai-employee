@@ -1,12 +1,13 @@
 [project]
 name = "ai-employee"
 version = "0.1.0"
-description = "Greeting CLI, arithmetic CLI, and a small HTTP API for greetings and integer tasks."
+description = "Greeting CLI, arithmetic CLI, and HTTP APIs for greetings, integer tasks, and country time."
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Rana Masud" }]
 dependencies = [
     "fastapi>=0.115",
+    "tzdata>=2024.1",
     "uvicorn>=0.32",
 ]
 
@@ -21,13 +22,14 @@ dev = [
 hello = "hello:main"
 arith = "arith:main"
 api = "api:main"
+country-time = "country_time_api:main"
 
 [build-system]
 requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["hello", "arith", "api"]
+py-modules = ["hello", "arith", "api", "country_zones", "country_time_api"]
 
 [tool.ruff]
 line-length = 100
@@ -42,7 +44,7 @@ addopts = "-ra"
 
 [tool.mypy]
 python_version = "3.12"
-files = ["hello.py", "arith.py", "api.py", "tests"]
+files = ["hello.py", "arith.py", "api.py", "country_zones.py", "country_time_api.py", "tests"]
 warn_return_any = true
 warn_unused_configs = true
 no_implicit_optional = true
