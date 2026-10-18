@@ -1,20 +1,33 @@
 [project]
 name = "ai-employee"
 version = "0.1.0"
-description = "Python greeting CLI created by the AI employee developer workflow."
+description = "Greeting CLI, arithmetic CLI, and a small HTTP API for greetings and integer tasks."
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Rana Masud" }]
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx2>=2.0",
+    "mypy>=1.13",
+    "ruff>=0.8",
+]
 
 [project.scripts]
 hello = "hello:main"
+arith = "arith:main"
+api = "api:main"
 
 [build-system]
 requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["hello"]
+py-modules = ["hello", "arith", "api"]
 
 [tool.ruff]
 line-length = 100
@@ -29,7 +42,7 @@ addopts = "-ra"
 
 [tool.mypy]
 python_version = "3.12"
-files = ["hello.py", "tests"]
+files = ["hello.py", "arith.py", "api.py", "tests"]
 warn_return_any = true
 warn_unused_configs = true
 no_implicit_optional = true

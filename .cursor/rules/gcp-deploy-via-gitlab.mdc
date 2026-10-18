@@ -1,0 +1,33 @@
+---
+description: Deploy every new API or project to the Google Cloud VM through GitLab CI
+alwaysApply: true
+---
+
+# Google Cloud deploy path
+
+When a new API is created, or a new project is created, deploy it to the Google Cloud VM through GitLab CI. This applies to every new API, not only `api.py`.
+
+- Pipeline file: `.gitlab-ci.yml` on GitLab. Test first, then deploy that checked-out revision.
+- Do not deploy with GitHub Actions or `.github/workflows/ci.yml`.
+- Do not copy files from the local machine with `gcloud compute scp`, `scp`, `rsync`, or a manual SSH upload.
+- For each new API, add a systemd unit under `deploy/`, install it on the VM, enable it, and start it. Listen on `0.0.0.0` on that API's port.
+- After deploy, call the API and confirm the service is active. If the smoke test fails, stop and report.
+- Default target: project `project-5ef2d071-c630-49cb-922`, zone `us-central1-a`, VM `rana-python-app-server`.
+- Keep deploy credentials in GitLab CI/CD variables. Do not put secret values in the repo or in chat.
+
+```yaml
+# Good shape of .gitlab-ci.yml. The commands below must be real steps in that file.
+stages: [test, deploy]
+deploy_vm:
+  stage: deploy
+  script:
+    - test the API
+    - install its deploy/*.service unit on the VM
+    - enable and start the service
+    - call the API and confirm the service is active
+```
+
+```powershell
+# Bad: uploading the working tree from this PC
+gcloud compute scp api.py rana-python-app-server:/home/khand/ai-employee/
+```

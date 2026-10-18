@@ -16,7 +16,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: python -m pip install -e ".[dev]"
       - name: Compile
-        run: python -m compileall -q hello.py tests
+        run: python -m compileall -q hello.py arith.py api.py tests
+      - name: Lint
+        run: ruff check hello.py arith.py api.py tests
+      - name: Type check
+        run: mypy
       - name: Test
         run: python -m unittest discover -s tests -v
