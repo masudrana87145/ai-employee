@@ -36,7 +36,7 @@ jobs:
       - name: Copy the revision to the VM and restart the API
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          VM_HOST: 34.44.253.122
+          VM_HOST: 35.224.217.181
           VM_USER: masudrana87145
         run: |
           set -euo pipefail
